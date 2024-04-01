@@ -42,36 +42,6 @@ namespace _11
             }
         }
 
-        private void b_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void c_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void a_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
-
         private void button2_Click(object sender, EventArgs e)
         {
             MessageBox.Show("√ражданин 1 марта открыл счет в банке, вложив A руб.„ерез каждый мес€ц размер вклада увеличиваетс€ на 2 % от имеющейс€ суммы. ќпределить: а) за какой мес€ц величина ежемес€чного увеличени€ вклада превысит B руб.; б) через сколько мес€цев размер вклада превысит C руб");

@@ -11,6 +11,8 @@ namespace _11.Tests
     [TestClass()]
     public class LogicTests
     {
+        //Тест 1
+        //Ситуация - Ежемесячное увеличение превышает 50 рублей
         [TestMethod()]
         public void CountingBTest()
         {
@@ -21,8 +23,10 @@ namespace _11.Tests
 
             Assert.AreEqual(47, result);
         }
+        //Тест 2
+        //Ситуация - Размер вклада превышает 2000 рублей
         [TestMethod()]
-        public void CountingC()
+        public void CountingCTest()
         {
             double A = 1000;
             double C = 2000;
@@ -31,5 +35,30 @@ namespace _11.Tests
 
             Assert.AreEqual(36, result);
         }
+        //Тест 3
+        //Ситуация - Размер вклада равняется размеру суммы, которую необходимо превысить
+        [TestMethod()]
+        public void CountingCTest1()
+        {
+            double A = 1000;
+            double C = 1000;
+
+            int result = Logic.CountingC(A, C);
+
+            Assert.AreEqual(1, result);
+        }
+        //Тест 4
+        //Ситуация - Сумма, которую необходимо превысить меньше начального вклада
+        [TestMethod()]
+        public void CountingCTest2()
+        {
+            double A = 2000;
+            double C = 1000;
+
+            int result = Logic.CountingC(A, C);
+
+            Assert.AreEqual(0, result);
+        }
+
     }
 }

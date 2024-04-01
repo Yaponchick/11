@@ -41,25 +41,23 @@
             // 
             // b
             // 
-            b.Location = new Point(5, 105);
+            b.Location = new Point(1, 137);
             b.Name = "b";
             b.Size = new Size(125, 27);
             b.TabIndex = 2;
-            b.TextChanged += b_TextChanged;
             b.KeyPress += b_KeyPress;
             // 
             // c
             // 
-            c.Location = new Point(5, 178);
+            c.Location = new Point(1, 210);
             c.Name = "c";
             c.Size = new Size(125, 27);
             c.TabIndex = 3;
-            c.TextChanged += c_TextChanged;
             c.KeyPress += c_KeyPress;
             // 
             // button1
             // 
-            button1.Location = new Point(5, 211);
+            button1.Location = new Point(1, 243);
             button1.Name = "button1";
             button1.Size = new Size(125, 29);
             button1.TabIndex = 4;
@@ -70,37 +68,34 @@
             // 
             // a
             // 
-            a.Location = new Point(5, 32);
+            a.Location = new Point(1, 64);
             a.Name = "a";
             a.Size = new Size(125, 27);
             a.TabIndex = 1;
-            a.TextChanged += a_TextChanged;
             a.KeyPress += a_KeyPress;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(5, 9);
+            label1.Location = new Point(1, 41);
             label1.Name = "label1";
             label1.Size = new Size(254, 20);
             label1.TabIndex = 5;
             label1.Text = "Сколько гражданин вложил денег?";
-            label1.Click += label1_Click;
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(5, 62);
+            label2.Location = new Point(1, 94);
             label2.Name = "label2";
             label2.Size = new Size(261, 40);
             label2.TabIndex = 6;
             label2.Text = "Какое значение должно превысить \r\nежемесячное увелечение вклада?";
-            label2.Click += label2_Click;
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(5, 135);
+            label3.Location = new Point(1, 167);
             label3.Name = "label3";
             label3.Size = new Size(269, 40);
             label3.TabIndex = 7;
@@ -108,7 +103,7 @@
             // 
             // button2
             // 
-            button2.Location = new Point(172, 178);
+            button2.Location = new Point(1, 9);
             button2.Name = "button2";
             button2.Size = new Size(94, 29);
             button2.TabIndex = 5;
@@ -118,9 +113,9 @@
             // 
             // button3
             // 
-            button3.Location = new Point(172, 211);
+            button3.Location = new Point(147, 210);
             button3.Name = "button3";
-            button3.Size = new Size(94, 29);
+            button3.Size = new Size(94, 61);
             button3.TabIndex = 6;
             button3.Text = "Очистить";
             button3.UseVisualStyleBackColor = true;
@@ -131,7 +126,7 @@
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.InactiveCaption;
-            ClientSize = new Size(278, 254);
+            ClientSize = new Size(262, 283);
             Controls.Add(button3);
             Controls.Add(button2);
             Controls.Add(label3);
@@ -143,7 +138,6 @@
             Controls.Add(b);
             Name = "Вклад";
             Text = "Вклад";
-            Load += Form1_Load;
             ResumeLayout(false);
             PerformLayout();
         }
