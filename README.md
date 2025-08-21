@@ -18,7 +18,6 @@ interface LogEntry {
 const AdminPanel = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [admin, setAdmin] = useState<User[]>([]);
-
     const [logs, setLogs] = useState<LogEntry[]>([]);
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState<boolean>(false);
@@ -26,12 +25,13 @@ const AdminPanel = () => {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [isModalOpenList, setIsModalOpenList] = useState<boolean>(false);
     const [isModalOpenChange, setisModalOpenChange] = useState<boolean>(false);
-    const [selectedUser, setSelectedUser] = useState('');
+    const [selectedUser, setSelectedUser] = useState<User | null>(null); // Теперь хранит весь объект
 
+    // Маппинг ID роли на читаемое название
     const roleLabels: { [key: number]: string } = {
         1: 'Админ',
         2: 'Создатель',
-        3: 'Респонтенд'
+        3: 'Респондент'
     };
 
     const getRoleLabel = (roleId: number): string => {
@@ -43,15 +43,11 @@ const AdminPanel = () => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const [usersRes] = await Promise.all([
-                    apiClient.get<User[]>('/user/infoUser'),
-                ]);
-                const [AdminRes] = await Promise.all([
-                    apiClient.get<User[]>('/user/infoAdmin'),
-                ]);
-                setUsers(usersRes.data);
-                setAdmin(AdminRes.data);
+                const usersRes = await apiClient.get<User[]>('/user/infoUser');
+                const adminRes = await apiClient.get<User[]>('/user/infoAdmin');
 
+                setUsers(usersRes.data);
+                setAdmin(adminRes.data);
             } catch (err: any) {
                 console.error('Ошибка загрузки данных:', err);
                 setError('Не удалось загрузить данные. Проверьте подключение или права доступа.');
@@ -81,7 +77,6 @@ const AdminPanel = () => {
         const password = (form.password as HTMLInputElement).value;
         const confirmPassword = (form.confirmPassword as HTMLInputElement).value;
 
-        // Очистка ошибок
         setError('');
         setLoading(true);
 
@@ -117,6 +112,38 @@ const AdminPanel = () => {
         }
     };
 
+    // Обработка изменения роли
+    const handleChangeRole = async (newRoleId: number) => {
+        if (!selectedUser) return;
+
+        const newRoleName = roleLabels[newRoleId] || 'неизвестная роль';
+
+        if (!window.confirm(`Установить роль "${newRoleName}" для ${selectedUser.fullName}?`)) {
+            return;
+        }
+
+        try {
+            await apiClient.put(`/user/${selectedUser.id}/role`, {
+                role: newRoleId,
+            });
+
+            // Обновляем пользователя в списке
+            setUsers((prev) =>
+                prev.map((user) =>
+                    user.id === selectedUser.id ? { ...user, role: newRoleId } : user
+                )
+            );
+
+            alert('Роль успешно изменена');
+            setisModalOpenChange(false);
+            setSelectedUser(null);
+        } catch (err: any) {
+            const message =
+                err.response?.data?.message ||
+                'Ошибка при изменении роли. Попробуйте позже.';
+            alert(message);
+        }
+    };
 
     if (loading) {
         return (
@@ -137,12 +164,11 @@ const AdminPanel = () => {
 
     return (
         <div className="adminPanel-container">
-            {/* Модальное окно списка админов */}
+            {/* Модальное окно: Список админов */}
             {isModalOpenList && (
-                <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+                <div className="modal-overlay" onClick={() => setIsModalOpenList(false)}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <h3>Список админов</h3>
-
                         <table className="surveyAdmin-table">
                             <thead>
                                 <tr>
@@ -150,17 +176,16 @@ const AdminPanel = () => {
                                     <th>Фамилия И.О.</th>
                                 </tr>
                             </thead>
-                            {filteredAdmin.map((user) => (
-
-                                <tr key={user.id}>
-                                    <td>{user.id}</td>
-                                    <td>{user.fullName}</td>
-
-                                </tr>
-                            ))}
+                            <tbody>
+                                {filteredAdmin.map((user) => (
+                                    <tr key={user.id}>
+                                        <td>{user.id}</td>
+                                        <td>{user.fullName}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
                         </table>
-
-                        <div className='buttonAdminListContainer'>
+                        <div className="buttonAdminListContainer">
                             <button
                                 type="button"
                                 className="buttonAdminList"
@@ -172,7 +197,8 @@ const AdminPanel = () => {
                     </div>
                 </div>
             )}
-            {/* Модальное окно регистрации */}
+
+            {/* Модальное окно: Регистрация */}
             {isModalOpen && (
                 <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -217,22 +243,47 @@ const AdminPanel = () => {
                     </div>
                 </div>
             )}
-            {isModalOpenChange && (
+
+            {/* Модальное окно: Изменение роли */}
+            {isModalOpenChange && selectedUser && (
                 <div className="modal-overlay" onClick={() => setisModalOpenChange(false)}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        {selectedUser}
-                        
+                        <h3>Изменить роль для {selectedUser.fullName}</h3>
+
+                        <div className="role-buttons">
+                            {Object.entries(roleLabels).map(([roleId, roleName]) => {
+                                const id = Number(roleId);
+                                return (
+                                    <button
+                                        key={id}
+                                        className={`buttonAdmin ${selectedUser.role === id ? 'active-role' : ''}`}
+                                        onClick={() => handleChangeRole(id)}
+                                    >
+                                        {roleName}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        <div style={{ marginTop: '1rem' }}>
+                            <button
+                                type="button"
+                                className="buttonAdmin"
+                                style={{ backgroundColor: '#6c757d' }}
+                                onClick={() => setisModalOpenChange(false)}
+                            >
+                                Отмена
+                            </button>
+                        </div>
                     </div>
                 </div>
-
             )}
 
-
+            {/* Основной контент */}
             <div className="adminPanel-inner-container">
-                {/* Таблица пользователей */}
                 <div className="tableAdmin-container">
                     <h2 className="headingText">Список пользователей</h2>
-                    <div className='filterAdminContainer'>
+                    <div className="filterAdminContainer">
                         <div className="filterAdmin">
                             <input
                                 type="text"
@@ -248,17 +299,20 @@ const AdminPanel = () => {
                             >
                                 Зарегистрировать
                             </button>
-                            <button onClick={() => setIsModalOpenList(true)}
-                                className="buttonAdmin">
+                            <button
+                                className="buttonAdmin"
+                                onClick={() => setIsModalOpenList(true)}
+                            >
                                 Список админов
                             </button>
                         </div>
                     </div>
+
                     <table className="surveyAdmin-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Фамилия И.О.</th>
+                                <th>ФИО</th>
                                 <th>Роль</th>
                                 <th>Действие</th>
                             </tr>
@@ -277,43 +331,15 @@ const AdminPanel = () => {
                                                 </button>
                                                 <div className="dropdown-content">
                                                     <div className="context-button">
-
-                                                        <button className="menu-item"
-                                                            onClick={() => {
-
-                                                                setSelectedUser(user.fullName);
-                                                                setisModalOpenChange(true)
-                                                            }}>
-                                                            Изменить роль
-                                                        </button>
-
-                                                        {/* <button
+                                                        <button
                                                             className="menu-item"
-                                                            onClick={async () => {
-                                                                const newRole = prompt(
-                                                                    `Введите новую роль: Admin, Creator или Respondent`,
-                                                                    user.role
-                                                                );
-
-                                                                if (!newRole) return;
-
-                                                                try {
-                                                                    await apiClient.put(`/user/${user.id}/role`, { role: newRole });
-                                                                    alert('Роль обновлена');
-
-                                                                } catch (err: any) {
-                                                                    const message =
-                                                                        err.response?.data?.message ||
-                                                                        'Ошибка изменения роли. Проверьте название роли.';
-                                                                    alert(message);
-                                                                }
+                                                            onClick={() => {
+                                                                setSelectedUser(user);
+                                                                setisModalOpenChange(true);
                                                             }}
                                                         >
                                                             Изменить роль
-                                                        </button> */}
-
-
-
+                                                        </button>
 
                                                         <button
                                                             className="menu-item danger"
@@ -340,7 +366,7 @@ const AdminPanel = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={3} className="no-data">
+                                    <td colSpan={4} className="no-data">
                                         Пользователи не найдены
                                     </td>
                                 </tr>
