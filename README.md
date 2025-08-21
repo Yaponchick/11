@@ -1,16 +1,3 @@
-[{
-	"resource": "/c:/Users/ZhivotovSS/Desktop/Frontend/src/pages/adminPanel/adminPanel.tsx",
-	"owner": "typescript",
-	"code": "2345",
-	"severity": 8,
-	"message": "Аргумент типа \"string\" нельзя назначить параметру типа \"number\".",
-	"source": "ts",
-	"startLineNumber": 270,
-	"startColumn": 59,
-	"endLineNumber": 270,
-	"endColumn": 68
-}]
-
 import React, { useState, useEffect } from 'react';
 import apiClient from '../../api/apiClient';
 import './adminPanelStyle.css';
@@ -18,7 +5,7 @@ import './adminPanelStyle.css';
 interface User {
     id: number;
     fullName: string;
-    role: string;
+    role: number;
 }
 
 interface LogEntry {
@@ -130,6 +117,7 @@ const AdminPanel = () => {
         }
     };
 
+
     if (loading) {
         return (
             <div className="loading-spinner-container">
@@ -233,6 +221,7 @@ const AdminPanel = () => {
                 <div className="modal-overlay" onClick={() => setisModalOpenChange(false)}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         {selectedUser}
+                        
                     </div>
                 </div>
 
