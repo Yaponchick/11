@@ -1,39 +1,118 @@
-[HttpPut("{questionnaireId}/questions/order")]
-public async Task<IActionResult> UpdateQuestionOrder(int questionnaireId, [FromBody] List<int> questionIds)
+// Вывод полной информации по анкете
+
+[HttpGet("{questionnaireId}")]
+[Authorize]
+public async Task<IActionResult> GetQuestionnaireById(int questionnaireId)
 {
-    try
+    Console.WriteLine($"Запрос на получение анкеты с ID: {questionnaireId}");
+
+    var (userId, anonymousId) = await GetUserIdAndAnonymousIdAsync();
+    if (userId == null && anonymousId == null)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
-            return Unauthorized();
-        
-        // Проверка владения анкетой
-        var questionnaireExists = await _context.Questionnaires
-            .AnyAsync(q => q.Id == questionnaireId && q.UserId == userId);
-        
-        if (!questionnaireExists)
-            return NotFound("Анкета не найдена");
-        
-        var existingQuestions = await _context.Questions
-            .Where(q => q.QuestionnaireId == questionnaireId)
-            .ToListAsync();
-        
-        foreach (var question in existingQuestions)
+        Console.WriteLine("Ошибка: Не удалось получить ID пользователя.");
+        return Unauthorized("Не удалось получить ID пользователя.");
+    }
+
+    // Загружаем все необходимые связанные данные одним запросом
+    var questionnaire = await _context.Questionnaires
+        .Include(q => q.Questions.OrderBy(qu => qu.Order)) // Сортируем вопросы
+            .ThenInclude(qu => qu.Options.OrderBy(o => o.Order)) // Сортируем опции
+                .ThenInclude(o => o.Answers) // Включаем ответы, связанные с опциями
+                    .ThenInclude(a => a.User) // Включаем пользователя для этих ответов
+        .Include(q => q.Questions)
+            .ThenInclude(qu => qu.Answers) // Включаем ответы, связанные напрямую с вопросами
+                .ThenInclude(a => a.User) // Включаем пользователя для этих ответов
+        .FirstOrDefaultAsync(q => q.Id == questionnaireId);
+
+
+    if (questionnaire == null)
+    {
+        Console.WriteLine($"Анкета с ID {questionnaireId} не найдена.");
+        return NotFound(new { message = "Анкета не найдена." });
+    }
+
+    Console.WriteLine($"Анкета с ID {questionnaireId} успешно найдена.");
+
+    // Проверка прав доступа (остается без изменений)
+    var user = await _context.Users
+        .Include(u => u.AccessLevel)
+        .FirstOrDefaultAsync(u => u.Id == userId);
+
+    if (user == null)
+    {
+        Console.WriteLine("Ошибка: Пользователь не найден.");
+        return Unauthorized("Пользователь не найден.");
+    }
+
+    if (questionnaire.UserId != userId && user.AccessLevel?.LevelName != "admin") 
+    {
+        Console.WriteLine("Ошибка: У пользователя нет прав для просмотра этой анкеты.");
+        return StatusCode(403, new { message = "У вас нет прав для просмотра этой анкеты." });
+    }
+
+    // Формируем данные для возврата с правильной структурой
+    var result = new
+    {
+        Id = questionnaire.Id, 
+        Title = questionnaire.Title,
+        CreatedAt = questionnaire.CreatedAt,
+        IsPublished = questionnaire.IsPublished,
+        Questions = questionnaire.Questions.Select(q =>
         {
-            var newOrder = questionIds.IndexOf(question.Id) + 1; // Теперь работает!
-            if (newOrder > 0)
+            // --- Объединяем ВСЕ ответы на этот вопрос в один список ---
+            var allAnswersForQuestion = new List<object>();
+
+            // 1. Добавляем ответы, связанные напрямую с вопросом (текст, шкала)
+            allAnswersForQuestion.AddRange(q.Answers.Select(a => new
             {
-                question.Order = newOrder;
-                question.UpdatedAt = DateTime.UtcNow;
+                a.Id,
+                Text = a.Text, // Текст ответа (для text, scale)
+                SelectedOptionText = (string)null, // Для этих типов нет выбранной опции
+                a.CreatedAt,
+                UserId = a.UserId ?? anonymousId,
+                UserName = a.User?.Username ?? "Аноним",
+                IsAnonymous = a.UserId == null
+            }));
+
+            // 2. Добавляем ответы, связанные через опции (radio, checkbox, select)
+            foreach (var option in q.Options)
+            {
+                allAnswersForQuestion.AddRange(option.Answers.Select(a => new
+                {
+                    a.Id,
+                    Text = (string)null, // Для этих типов основной текст ответа не используется
+                    SelectedOptionText = option.OptionText, // Текст ВЫБРАННОЙ опции
+                    a.CreatedAt,
+                    UserId = a.UserId ?? anonymousId,
+                    UserName = a.User?.Username ?? "Аноним",
+                    IsAnonymous = a.UserId == null
+                }));
             }
-        }
-        
-        await _context.SaveChangesAsync();
-        return Ok(new { message = "Порядок обновлен" });
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Ошибка при обновлении порядка");
-        return StatusCode(500, "Ошибка сервера");
-    }
+
+            // Сортируем объединенные ответы по времени создания для консистентности
+            allAnswersForQuestion = allAnswersForQuestion
+               .OrderBy(a => ((dynamic)a).CreatedAt)
+               .ToList();
+
+
+            // --- Возвращаем данные вопроса с правильным типом и объединенными ответами ---
+            return new
+            {
+                Id = q.Id,
+                Text = q.Text,
+                Type = MapQuestionTypeIdToString(q.QuestionTypeId), // <--- Преобразуем ID в строку
+                                                                    // Не отправляем QuestionTypeId, если он не нужен фронтенду
+                Options = q.Options.Select(o => new // Опции нужны фронтенду для отображения возможных вариантов
+                {
+                    Id = o.Id,
+                    OptionText = o.OptionText,
+                    Order = o.Order
+                    // Не включаем ответы здесь, т.к. они объединены ниже
+                }).ToList(),
+                Answers = allAnswersForQuestion // <--- Отправляем ЕДИНЫЙ список всех ответов
+            };
+        }).ToList()
+    };
+
+    return Ok(result);
 }
