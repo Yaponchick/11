@@ -1,40 +1,37 @@
 [HttpPut("{questionnaireId}/questions/order")]
-public async Task<IActionResult> UpdateQuestionOrder(string questionnaireId, [FromBody] List<string> questionIds) // Исправлено на string
+public async Task<IActionResult> UpdateQuestionOrder(Guid questionnaireId, [FromBody] List<Guid> questionIds)
 {
     try
     {
-        // Проверка авторизации и прав доступа
+        // Проверка авторизации
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userId))
             return Unauthorized();
         
-        // Проверка, что анкета принадлежит пользователю
-        var questionnaire = await _context.Questionnaires
-            .FirstOrDefaultAsync(q => q.Id.ToString() == questionnaireId && q.UserId.ToString() == userId); // Исправлено сравнение
+        // Проверяем, что пользователь владеет анкетой
+        var canEdit = await _context.Questionnaires
+            .AnyAsync(q => q.Id == questionnaireId && q.UserId == Guid.Parse(userId));
         
-        if (questionnaire == null)
-            return NotFound("Анкета не найдена или у вас нет прав на её редактирование");
+        if (!canEdit)
+            return Forbid();
         
-        // Обновление порядка вопросов
-        for (int i = 0; i < questionIds.Count; i++)
+        // Массовое обновление порядка
+        var questionsToUpdate = await _context.Questions
+            .Where(q => q.QuestionnaireId == questionnaireId && questionIds.Contains(q.Id))
+            .ToListAsync();
+        
+        foreach (var question in questionsToUpdate)
         {
-            var questionId = questionIds[i];
-            var question = await _context.Questions
-                .FirstOrDefaultAsync(q => q.Id.ToString() == questionId && q.QuestionnaireId.ToString() == questionnaireId); // Исправлено сравнение
-            
-            if (question != null)
-            {
-                question.Order = i + 1;
-                question.UpdatedAt = DateTime.UtcNow; // Обновляем время изменения
-            }
+            question.Order = questionIds.IndexOf(question.Id) + 1;
+            question.UpdatedAt = DateTime.UtcNow;
         }
         
         await _context.SaveChangesAsync();
-        return Ok(new { message = "Порядок вопросов успешно обновлен" });
+        return Ok();
     }
     catch (Exception ex)
     {
-        _logger.LogError(ex, "Ошибка при обновлении порядка вопросов");
-        return StatusCode(500, "Произошла ошибка при обновлении порядка");
+        _logger.LogError(ex, "Ошибка при обновлении порядка");
+        return StatusCode(500, "Internal server error");
     }
 }
