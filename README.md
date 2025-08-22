@@ -1,143 +1,376 @@
-info: Microsoft.Hosting.Lifetime[14]
-      Now listening on: https://localhost:7109
-info: Microsoft.Hosting.Lifetime[14]
-      Now listening on: http://localhost:5229
-info: Microsoft.Hosting.Lifetime[0]
-      Application started. Press Ctrl+C to shut down.
-info: Microsoft.Hosting.Lifetime[0]
-      Hosting environment: Development
-info: Microsoft.Hosting.Lifetime[0]
-      Content root path: C:\Users\ZhivotovSS\Desktop\Web\Web
-Запрос получен с токеном: c9a3a864-1510-4c84-883a-1c561fb9f512
-warn: Microsoft.EntityFrameworkCore.Query[20504]
-      Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (26ms) [Parameters=[@__token_0='?' (Size = 36) (DbType = AnsiString)], CommandType='Text', CommandTimeout='30']
-      SELECT [q2].[id], [q2].[access_link_token], [q2].[created_at], [q2].[IsFavorite], [q2].[is_published], [q2].[title], [q2].[type_questionnaire_ID], [q2].[user_ID], [s].[id], [s].[Order], [s].[question_type_ID], [s].[questionnaire_ID], [s].[text], [s].[id0], [s].[option_text], [s].[order0], [s].[question_ID]
-      FROM (
-          SELECT TOP(1) [q].[id], [q].[access_link_token], [q].[created_at], [q].[IsFavorite], [q].[is_published], [q].[title], [q].[type_questionnaire_ID], [q].[user_ID]
-          FROM [Questionnaire] AS [q]
-          WHERE CONVERT(varchar(36), [q].[access_link_token]) = @__token_0 AND [q].[is_published] = CAST(1 AS bit)
-      ) AS [q2]
-      LEFT JOIN (
-          SELECT [q0].[id], [q0].[Order], [q0].[question_type_ID], [q0].[questionnaire_ID], [q0].[text], [q1].[id] AS [id0], [q1].[option_text], [q1].[order] AS [order0], [q1].[question_ID]
-          FROM [Question] AS [q0]
-          LEFT JOIN [QuestionOption] AS [q1] ON [q0].[id] = [q1].[question_ID]
-      ) AS [s] ON [q2].[id] = [s].[questionnaire_ID]
-      ORDER BY [q2].[id], [s].[Order], [s].[id], [s].[order0]
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (2ms) [Parameters=[@__accessLinkToken_0='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']
-      SELECT TOP(1) [q].[id], [q].[access_link_token], [q].[created_at], [q].[IsFavorite], [q].[is_published], [q].[title], [q].[type_questionnaire_ID], [q].[user_ID]
-      FROM [Questionnaire] AS [q]
-      WHERE [q].[access_link_token] = @__accessLinkToken_0
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (2ms) [Parameters=[@__questionId_0='?' (DbType = Int32), @__questionnaire_Id_1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
-      SELECT [q1].[id], [q1].[Order], [q1].[question_type_ID], [q1].[questionnaire_ID], [q1].[text], [q0].[id], [q0].[option_text], [q0].[order], [q0].[question_ID]
-      FROM (
-          SELECT TOP(1) [q].[id], [q].[Order], [q].[question_type_ID], [q].[questionnaire_ID], [q].[text]
-          FROM [Question] AS [q]
-          WHERE [q].[id] = @__questionId_0 AND [q].[questionnaire_ID] = @__questionnaire_Id_1
-      ) AS [q1]
-      LEFT JOIN [QuestionOption] AS [q0] ON [q1].[id] = [q0].[question_ID]
-      ORDER BY [q1].[id]
-fail: Microsoft.EntityFrameworkCore.Database.Command[20102]
-      Failed executing DbCommand (3ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']
-      SET IMPLICIT_TRANSACTIONS OFF;
-      SET NOCOUNT ON;
-      INSERT INTO [Anonymous] ([CreatedAt], [session_id])
-      OUTPUT INSERTED.[id]
-      VALUES (@p0, @p1);
-fail: Microsoft.EntityFrameworkCore.Update[10000]
-      An exception occurred in the database while saving changes for context type 'Web.Models.QuestionnaireContext'.
-      Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
-       ---> Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid column name 'CreatedAt'.
-         at Microsoft.Data.SqlClient.SqlCommand.<>c.<ExecuteDbDataReaderAsync>b__211_0(Task`1 result)
-         at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
-         at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
-      --- End of stack trace from previous location ---
-         at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
-         at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
-      --- End of stack trace from previous location ---
-         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
-      ClientConnectionId:165e6a5a-e1ea-45c6-ab02-6790dcf7795f
-      Error Number:207,State:1,Class:16
-         --- End of inner exception stack trace ---
-         at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.SqlServer.Update.Internal.SqlServerModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.Storage.RelationalDatabase.SaveChangesAsync(IList`1 entries, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(IList`1 entriesToSave, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(StateManager stateManager, Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
-      Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
-       ---> Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid column name 'CreatedAt'.
-         at Microsoft.Data.SqlClient.SqlCommand.<>c.<ExecuteDbDataReaderAsync>b__211_0(Task`1 result)
-         at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
-         at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
-      --- End of stack trace from previous location ---
-         at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
-         at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
-      --- End of stack trace from previous location ---
-         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
-      ClientConnectionId:165e6a5a-e1ea-45c6-ab02-6790dcf7795f
-      Error Number:207,State:1,Class:16
-         --- End of inner exception stack trace ---
-         at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.SqlServer.Update.Internal.SqlServerModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.Storage.RelationalDatabase.SaveChangesAsync(IList`1 entries, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(IList`1 entriesToSave, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(StateManager stateManager, Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
-fail: Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware[1]
-      An unhandled exception has occurred while executing the request.
-      Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
-       ---> Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid column name 'CreatedAt'.
-         at Microsoft.Data.SqlClient.SqlCommand.<>c.<ExecuteDbDataReaderAsync>b__211_0(Task`1 result)
-         at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
-         at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
-      --- End of stack trace from previous location ---
-         at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
-         at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
-      --- End of stack trace from previous location ---
-         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
-      ClientConnectionId:165e6a5a-e1ea-45c6-ab02-6790dcf7795f
-      Error Number:207,State:1,Class:16
-         --- End of inner exception stack trace ---
-         at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.SqlServer.Update.Internal.SqlServerModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.Storage.RelationalDatabase.SaveChangesAsync(IList`1 entries, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(IList`1 entriesToSave, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(StateManager stateManager, Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
-         at Web.Controllers.QuestionnaireController.GetUserIdAndAnonymousIdAsync() in C:\Users\ZhivotovSS\Desktop\Web\Web\Controllers\QuestionnaireController.cs:line 336
-         at Web.Controllers.QuestionnaireController.SubmitAnswer(Guid accessLinkToken, Int32 questionId, AnswerRequest request) in C:\Users\ZhivotovSS\Desktop\Web\Web\Controllers\QuestionnaireController.cs:line 1149
-         at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
-         at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
-         at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-         at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
-         at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
-         at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
-         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
-         at Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddlewareImpl.<Invoke>g__Awaited|10_0(ExceptionHandlerMiddlewareImpl middleware, HttpContext context, Task task)
-fail: Program[0]
-      Ошибка сервера: 500
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useParams, useNavigate } from 'react-router-dom';
+
+// Типы
+interface Author {
+  firstName: string;
+  lastName: string;
+}
+
+interface Option {
+  id: number;
+  optionText: string;
+  order: number;
+}
+
+export interface Question {
+  id: number;
+  text: string;
+  questionTypeId: number;
+  options?: Option[];
+  leftScaleValue?: string;
+  rightScaleValue?: string;
+  divisions?: number;
+}
+
+interface QuestionnaireData {
+  title: string;
+  questions: Question[];
+  author: Author;
+}
+
+export type AnswerValue = string | number | number[] | null;
+
+export interface ValidationErrors {
+  [key: number]: string;
+}
+
+interface AnswersLogicState {
+  author: Author;
+  ansTitle: string;
+  questions: Question[];
+  answers: { [key: number]: AnswerValue };
+  isLoading: boolean;
+  apiError: string;
+  validationErrors: ValidationErrors;
+  isLoginModalOpen: boolean;
+  isRegisterModalOpen: boolean;
+  popup: PopupState;
+}
+
+interface AnswersLogicActions {
+  handleSubmit: () => void;
+  handleInputChange: (questionId: number, value: AnswerValue) => void;
+  handleCheckboxChange: (questionId: number, optionId: number) => void;
+  setLoginModalOpen: (open: boolean) => void;
+  setRegisterModalOpen: (open: boolean) => void;
+  submitAnswers: () => Promise<void>;
+  validateAnswers: () => boolean;
+  showPopup: (text: string, event: React.MouseEvent | null) => void;
+
+}
+
+export interface PopupState {
+  visible: boolean;
+  text: string;
+  x: number;
+  y: number;
+
+}
+
+export const useAnswersLogic = (): [AnswersLogicState, AnswersLogicActions] => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
+  const [author, setAuthor] = useState<Author>({ firstName: '', lastName: '' });
+  const [ansTitle, setAnsTitle] = useState<string>('');
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [answers, setAnswers] = useState<{ [key: number]: AnswerValue }>({});
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [apiError, setApiError] = useState<string>('');
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+  const [isLoginModalOpen, setLoginModalOpen] = useState<boolean>(false);
+  const [isRegisterModalOpen, setRegisterModalOpen] = useState<boolean>(false);
+  const [popup, setPopup] = useState<PopupState>({ visible: false, text: '', x: 0, y: 0 });
+
+  useEffect(() => {
+    const checkAndLoad = async () => {
+      if (!id) {
+        setApiError('Не указан идентификатор анкеты.');
+        setIsLoading(false);
+        return;
+      }
+
+      const token = localStorage.getItem('access_token');
+      
+      const response = await axios.get<QuestionnaireData>(
+        `https://localhost:7109/questionnaire/access/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const { title, questions: fetchedQuestions, author: fetchedAuthor } = response.data;
+
+      if (!fetchedQuestions || !Array.isArray(fetchedQuestions)) {
+        setApiError('Не удалось загрузить структуру вопросов.');
+        return;
+      }
+
+      setAuthor(fetchedAuthor || { firstName: '', lastName: '' });
+      setAnsTitle(title);
+
+      // Обработка вопросов 
+      const processedQuestions = fetchedQuestions.map((q) => {
+        if (q.questionTypeId === 4) {
+          const parts = q.text.split('|');
+          if (parts.length < 4) {
+            return {
+              ...q,
+              text: parts[0] || q.text,
+              leftScaleValue: 'Min',
+              rightScaleValue: 'Max',
+              divisions: 5,
+            };
+          }
+          return {
+            ...q,
+            text: parts[0] || '',
+            leftScaleValue: parts[1] || '',
+            rightScaleValue: parts[2] || '',
+            divisions: parseInt(parts[3], 10) || 5,
+          };
+        }
+        return q;
+      });
+
+      setQuestions(processedQuestions);
+
+      // Инициализация ответов
+      const initialAnswers: { [key: number]: AnswerValue } = {};
+      processedQuestions.forEach((q) => {
+        if (q.questionTypeId === 3) {
+          initialAnswers[q.id] = [];
+        } else if (q.questionTypeId === 4) {
+          const divisions = q.divisions || 5;
+          initialAnswers[q.id] = Math.ceil(divisions / 2);
+        } else {
+          initialAnswers[q.id] = '';
+        }
+      });
+      setAnswers(initialAnswers);
+      setIsLoading(false);
+      
+    };
+
+    checkAndLoad();
+  }, [id, navigate]);
+
+  const validateAnswers = (): boolean => {
+    const errors: ValidationErrors = {};
+    let firstErrorId: number | null = null;
+
+    for (const question of questions) {
+      const answer = answers[question.id];
+      let isEmpty = false;
+      let errorMsg = 'Пожалуйста, ответьте на этот вопрос';
+      const questionType = parseInt(question.questionTypeId.toString(), 10);
+
+      switch (questionType) {
+        case 1:
+          isEmpty = !answer || !String(answer).trim();
+          errorMsg = 'Пожалуйста, заполните это поле';
+          break;
+        case 2:
+          isEmpty = answer === '' || answer === null || answer === undefined;
+          errorMsg = 'Пожалуйста, выберите один вариант';
+          break;
+        case 3:
+          isEmpty = !Array.isArray(answer) || answer.length === 0;
+          errorMsg = 'Пожалуйста, выберите хотя бы один вариант';
+          break;
+        case 4:
+          isEmpty = isNaN(parseInt(answer as string, 10));
+          errorMsg = 'Пожалуйста, выберите значение на шкале';
+          break;
+        case 5:
+          isEmpty = answer === '' || answer === null || answer === undefined;
+          errorMsg = 'Пожалуйста, выберите один вариант из списка';
+          break;
+        default:
+          break;
+      }
+
+      if (isEmpty) {
+        errors[question.id] = errorMsg;
+        if (firstErrorId === null) firstErrorId = question.id;
+      }
+    }
+
+    setValidationErrors(errors);
+
+    if (firstErrorId !== null) {
+      const element = document.getElementById(`question-${firstErrorId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    return Object.keys(errors).length === 0;
+  };
+
+  const showPopup = (text: string, event: React.MouseEvent | null): void => {
+    const xPos = event ? event.clientX : window.innerWidth / 2;
+    const yPos = event ? event.clientY : window.innerHeight / 2;
+    setPopup({ visible: true, text, x: xPos, y: yPos });
+    setTimeout(() => {
+      setPopup((prev) => ({ ...prev, visible: false }));
+    }, 1800);
+  };
+
+  const submitAnswers = async () => {
+    setApiError('');
+    setValidationErrors({});
+
+    if (!validateAnswers()) {
+
+      showPopup('Заполните все поля', null);
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      for (const question of questions) {
+        const answer = answers[question.id];
+        let payload: { [key: string]: any } | null = null;
+        const questionType = parseInt(question.questionTypeId.toString(), 10);
+
+        switch (questionType) {
+          case 1:
+            payload = { AnswerText: String(answer).trim() };
+            break;
+
+          case 2:
+            const selectedSingle = question.options?.find((opt) => opt.id === parseInt(answer as string, 10));
+            if (!selectedSingle) {
+              return;
+            }
+            payload = { AnswerClose: selectedSingle.order };
+            break;
+
+          case 3:
+            if (!Array.isArray(answer) || answer.length === 0) {
+              return;
+            }
+            const orders = answer
+              .map((id) => question.options?.find((opt) => opt.id === id)?.order)
+              .filter((order): order is number => order !== undefined);
+            if (orders.length !== answer.length) {
+              return;
+            }
+            payload = { AnswerMultiple: orders };
+            break;
+
+          case 4:
+            const scaleValue = parseInt(answer as string, 10);
+            if (isNaN(scaleValue) || scaleValue < 1 || scaleValue > (question.divisions || 5)) {
+              return;
+            }
+            payload = { AnswerScale: scaleValue };
+            break;
+
+          case 5:
+            const dropdownValue = parseInt(answer as string, 10);
+            if (isNaN(dropdownValue) || answer === '') {
+              return;
+            }
+            payload = { AnswerClose: dropdownValue };
+            break;
+
+          default:
+            continue;
+        }
+
+        if (payload) {
+          await axios.post(
+            `https://localhost:7109/questionnaire/access/${id}/questions/${question.id}/answer`,
+            payload,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+        }
+      }
+
+      // Успешная отправка
+      navigate('/Thanks', { state: { questionnaireId: id } });
+
+    } catch (err: any) {
+      console.error('Ошибка при отправке ответов:', err);
+      if (err.response?.status === 404) {
+        setApiError('Анкета не найдена или закрыта.');
+      } else {
+        setApiError('Ошибка отправки. Попробуйте позже.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
+  const handleSubmit = () => {
+    submitAnswers();
+  };
+
+  const handleInputChange = (questionId: number, value: AnswerValue) => {
+    setAnswers((prev) => ({ ...prev, [questionId]: value }));
+    if (validationErrors[questionId]) {
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[questionId];
+        return newErrors;
+      });
+    }
+  };
+
+  const handleCheckboxChange = (questionId: number, optionId: number) => {
+    setAnswers((prev) => {
+      const current = (prev[questionId] as number[]) || [];
+      const updated = current.includes(optionId)
+        ? current.filter((id) => id !== optionId)
+        : [...current, optionId];
+      return { ...prev, [questionId]: updated };
+    });
+    if (validationErrors[questionId]) {
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[questionId];
+        return newErrors;
+      });
+    }
+  };
+
+  return [
+    {
+      author,
+      ansTitle,
+      questions,
+      answers,
+      isLoading,
+      apiError,
+      validationErrors,
+      isLoginModalOpen,
+      isRegisterModalOpen,
+      popup,
+
+    },
+    {
+      handleSubmit,
+      submitAnswers,
+      validateAnswers,
+      handleInputChange,
+      handleCheckboxChange,
+      setLoginModalOpen,
+      setRegisterModalOpen,
+      showPopup,
+
+    },
+  ];
+};
